@@ -61,13 +61,32 @@ const actions = {
             commit('register_error', err)
         }
     },
+    
+    // Confirm User
+    async confirm({
+        commit
+    }, confirmationCode) {
+        try {
+            console.log('confirmationCode nel auth '+confirmationCode);
+            commit('confirm_request');
+            let res = await axios.post('http://localhost:5005/api/users/confirm',confirmationCode);
+            console.log('res: '+JSON.stringify(res));
+            if (res.data.success !== undefined) {
+                commit('confirm_success');
+            }
+            return res;
+        } catch (err) {
+            commit('confirm_error', err)
+        }
+    },
     // Get the user Profile
     async getProfile({
         commit
     }) {
         commit('profile_request');
         try {
-            let res = await axios.get('http://localhost:5005/api/users/profile')
+            console.log('token '+JSON.stringify({ Authorization: axios.defaults.headers.common['Authorization']}));
+            let res = await axios.get('http://localhost:5005/api/users/profile',{ Authorization: axios.defaults.headers.common['Authorization']})
             commit('user_profile', res.data.user)
             return res;
         } catch (err) {
@@ -109,6 +128,17 @@ const mutations = {
         state.status = 'success'
     },
     register_error(state, err) {
+        state.error = err.response.data.msg
+    },
+    confirm_request(state) {
+        state.error = null
+        state.status = 'loading'
+    },
+    confirm_success(state) {
+        state.error = null
+        state.status = 'success'
+    },
+    confirm_error(state, err) {
         state.error = err.response.data.msg
     },
     logout(state) {
