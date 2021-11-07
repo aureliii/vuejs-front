@@ -1,11 +1,20 @@
 <template>
   <div id="app">
-    <Navbar/>
+    <div v-if="!isLoggedIn">
+      <Navbar/>
+      <router-view/>
+    </div>
+    <div v-else-if="isLoggedIn">
+       <div class="container">
+          <router-view/>
+         </div>
+    </div>
     <br>
     <br>
+
     <div class="container">
       <Errors v-if="error" :msg="error"/>
-      <router-view/>
+     
     </div>
   </div>
 </template>
@@ -13,13 +22,17 @@
 import { mapGetters } from "vuex";
 import Navbar from "@/components/Navbar";
 import Errors from "@/components/Errors";
+
+
 export default {
+  
   components: {
     Navbar,
     Errors
   },
   computed: {
-    ...mapGetters(["error"])
+    ...mapGetters(["error"]),
+    ...mapGetters(["isLoggedIn"])
   }
 };
 </script>
